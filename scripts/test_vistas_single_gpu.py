@@ -303,11 +303,16 @@ _PALETTE = ImagePalette.ImagePalette(
 
 def get_pred_image(tensor, out_size, with_palette):
     tensor = tensor.numpy()
-    if with_palette:
-        img = Image.fromarray(tensor.astype(np.uint8), mode="P")
-        img.putpalette(_PALETTE)
-    else:
-        img = Image.fromarray(tensor.astype(np.uint8), mode="L")
+
+    mask = np.where(tensor == 27, 255.0, 0.0)
+
+    # if with_palette:
+    #    img = Image.fromarray(tensor.astype(np.uint8), mode="P")
+    #    img.putpalette(_PALETTE)
+    # else:
+    #    img = Image.fromarray(tensor.astype(np.uint8), mode="L")
+
+    img = Image.fromarray(mask.astype(np.uint8), mode="L")
 
     return img.resize(out_size, Image.NEAREST)
 
