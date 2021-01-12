@@ -115,3 +115,7 @@ dist/
 *.egg-info
 .eggs/*
 inplace_abn/_version.py
+
+# checkpoints
+models/*
+
