@@ -4,9 +4,12 @@ import sys
 
 import torch
 
-parser = argparse.ArgumentParser(description="Testing script for the Vistas segmentation model")
-parser.add_argument("--scales", metavar="LIST", type=str, default="[0.7, 1, 1.2]", help="List of scales")
-parser.add_argument("--flip", action="store_true", help="Use horizontal flipping")
+parser = argparse.ArgumentParser(
+    description="Testing script for the Vistas segmentation model")
+parser.add_argument("--scales", metavar="LIST", type=str,
+                    default="[0.7, 1, 1.2]", help="List of scales")
+parser.add_argument("--flip", action="store_true",
+                    help="Use horizontal flipping")
 parser.add_argument("--fusion-mode", metavar="NAME", type=str, choices=["mean", "voting", "max"], default="mean",
                     help="How to fuse the outputs. Options: 'mean', 'voting', 'max'")
 parser.add_argument("--output-mode", metavar="NAME", type=str, choices=["palette", "raw", "prob"],
@@ -15,9 +18,11 @@ parser.add_argument("--output-mode", metavar="NAME", type=str, choices=["palette
                          " -- palette: color coded predictions"
                          " -- raw: gray-scale predictions"
                          " -- prob: gray-scale predictions plus probabilities")
-parser.add_argument("snapshot", metavar="SNAPSHOT_FILE", type=str, help="Snapshot file to load")
+parser.add_argument("snapshot", metavar="SNAPSHOT_FILE",
+                    type=str, help="Snapshot file to load")
 parser.add_argument("data", metavar="IN_DIR", type=str, help="Path to dataset")
-parser.add_argument("output", metavar="OUT_DIR", type=str, help="Path to output folder")
+parser.add_argument("output", metavar="OUT_DIR", type=str,
+                    help="Path to output folder")
 
 
 def docstring_hack():
@@ -51,7 +56,8 @@ def main():
             argslist.append(str(i))
         stdout = None if i == 0 else open("GPU_" + str(i) + ".log", "w")
         print(argslist)
-        p = subprocess.Popen([str(sys.executable), 'test_vistas_single_gpu.py'] + argslist, stdout=stdout)
+        p = subprocess.Popen(
+            [str(sys.executable), 'scripts/test_vistas_single_gpu.py'] + argslist, stdout=stdout)
         workers.append(p)
 
     for p in workers:
