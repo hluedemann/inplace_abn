@@ -2,6 +2,7 @@ import argparse
 from functools import partial
 from os import path
 
+from tqdm import tqdm
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
@@ -118,7 +119,7 @@ class SegmentationModule(nn.Module):
     def _network(self, x, scale):
         if scale != 1:
             scaled_size = [round(s * scale) for s in x.shape[-2:]]
-            x_up = functional.upsample(x, size=scaled_size, mode="bilinear")
+            x_up = functional.interpolate(x, size=scaled_size, mode="bilinear")
         else:
             x_up = x
 
@@ -136,7 +137,7 @@ class SegmentationModule(nn.Module):
         for scale in scales:
             # Main orientation
             sem_logits = self._network(x, scale)
-            sem_logits = functional.upsample(
+            sem_logits = functional.interpolate(
                 sem_logits, size=out_size, mode="bilinear")
             fusion.update(sem_logits)
 
@@ -144,7 +145,7 @@ class SegmentationModule(nn.Module):
             if do_flip:
                 # Main orientation
                 sem_logits = self._network(flip(x, -1), scale)
-                sem_logits = functional.upsample(
+                sem_logits = functional.interpolate(
                     sem_logits, size=out_size, mode="bilinear")
                 fusion.update(flip(sem_logits, -1))
 
@@ -164,7 +165,6 @@ def main():
     model = SegmentationModule(body, head, 256, 65, args.fusion_mode)
     model.cls.load_state_dict(cls_state)
     model = model.cuda().eval()
-    print(model)
 
     # Create data loader
     transformation = SegmentationTransform(
@@ -186,9 +186,9 @@ def main():
     # Run testing
     scales = eval(args.scales)
     with torch.no_grad():
-        for batch_i, rec in enumerate(data_loader):
-            print(
-                "Testing batch [{:3d}/{:3d}]".format(batch_i + 1, len(data_loader)))
+        for batch_i, rec in tqdm(enumerate(data_loader), total=len(data_loader)):
+            # print(
+            #    "Testing batch [{:3d}/{:3d}]".format(batch_i + 1, len(data_loader)))
 
             img = rec["img"].cuda(non_blocking=True)
             probs, preds = model(img, scales, args.flip)

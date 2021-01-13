@@ -47,7 +47,8 @@ def main():
         argslist.append(str(world_size))
 
     workers = []
-
+    print("\nStart ...")
+    print(f"Running on {world_size} GPUs\n")
     for i in range(world_size):
         if '--rank' in argslist:
             argslist[argslist.index('--rank') + 1] = str(i)
@@ -55,7 +56,7 @@ def main():
             argslist.append('--rank')
             argslist.append(str(i))
         stdout = None if i == 0 else open("GPU_" + str(i) + ".log", "w")
-        print(argslist)
+        # print(argslist)
         p = subprocess.Popen(
             [str(sys.executable), 'scripts/test_vistas_single_gpu.py'] + argslist, stdout=stdout)
         workers.append(p)
