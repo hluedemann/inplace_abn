@@ -185,7 +185,8 @@ def main():
         dataset,
         batch_size=1,
         pin_memory=True,
-        sampler=DistributedSampler(dataset, args.world_size, args.rank),
+        sampler=DistributedSampler(
+            dataset, args.world_size, args.rank, shuffle=False),
         num_workers=2,
         collate_fn=segmentation_collate,
         shuffle=False
