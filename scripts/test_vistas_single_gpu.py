@@ -1,7 +1,6 @@
 import argparse
 from functools import partial
-from os import path
-
+import os
 from tqdm import tqdm
 import numpy as np
 import torch
@@ -41,6 +40,10 @@ parser.add_argument("--world-size", metavar="WS", type=int,
                     default=1, help="Number of GPUs")
 parser.add_argument("--rank", metavar="RANK",
                     type=int, default=0, help="GPU id")
+
+
+def get_file_name(path):
+    return path.split("/")[-1].split(".")[0]
 
 
 def flip(x, dim):
@@ -156,6 +159,11 @@ def main():
     # Load configuration
     args = parser.parse_args()
 
+    # Check if output folder exists
+    if not os.path.exists(args.output):
+        os.makedirs(args.path)
+        print(f"\nCreated output dir: {args.output}\n")
+
     # Torch stuff
     torch.cuda.set_device(args.rank)
     cudnn.benchmark = True
@@ -195,20 +203,25 @@ def main():
 
             for i, (prob, pred) in enumerate(zip(torch.unbind(probs, dim=0), torch.unbind(preds, dim=0))):
                 out_size = rec["meta"][i]["size"]
-                img_name = rec["meta"][i]["idx"]
+                #img_name = rec["meta"][i]["idx"]
+                file_name = get_file_name(rec["meta"][i]["path"])
+                file_str = file_name[0:11]
+                img_out_name = file_str + "_sky"
+
+                print("Name: ", img_out_name)
 
                 # Save prediction
                 prob = prob.cpu()
                 pred = pred.cpu()
                 pred_img = get_pred_image(
                     pred, out_size, args.output_mode == "palette")
-                pred_img.save(path.join(args.output, img_name + ".png"))
+                pred_img.save(os.path.join(args.output, img_out_name + ".png"))
 
                 # Optionally save probabilities
                 if args.output_mode == "prob":
                     prob_img = get_prob_image(prob, out_size)
                     prob_img.save(
-                        path.join(args.output, img_name + "_prob.png"))
+                        os.path.join(args.output, img_out_name + "_prob.png"))
 
 
 def load_snapshot(snapshot_file):

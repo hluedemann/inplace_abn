@@ -35,7 +35,7 @@ class SegmentationDataset(Dataset):
             size = img_raw.size
             img = self.transform(img_raw.convert(mode="RGB"))
 
-        return {"img": img, "meta": {"idx": self.images[item]["idx"], "size": size}}
+        return {"img": img, "meta": {"idx": self.images[item]["idx"], "size": size, "path": self.images[item]["path"]}}
 
 
 def segmentation_collate(items):

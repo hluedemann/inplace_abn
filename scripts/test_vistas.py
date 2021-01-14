@@ -1,4 +1,5 @@
 import argparse
+import os
 import subprocess
 import sys
 
@@ -33,9 +34,21 @@ def docstring_hack():
     pass
 
 
+def create_dir(path):
+    try:
+        os.makedirs(path, exist_ok=True)
+    except:
+        print(f"\nFailed to create dir: {path}")
+    else:
+        print(f"\nCreated dir: {path}")
+
+
 def main():
     # Load configuration
     args = parser.parse_args()
+
+    # Create output dir
+    create_dir(args.output)
 
     argslist = list(sys.argv)[1:]
     world_size = torch.cuda.device_count()
