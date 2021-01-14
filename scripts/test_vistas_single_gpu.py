@@ -209,8 +209,6 @@ def main():
                 file_str = file_name[0:11]
                 img_out_name = file_str + "_sky"
 
-                print("Name: ", img_out_name)
-
                 # Save prediction
                 prob = prob.cpu()
                 pred = pred.cpu()
